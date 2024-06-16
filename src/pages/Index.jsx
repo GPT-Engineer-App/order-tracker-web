@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, VStack, Input, Button, Text, Box, Spinner } from "@chakra-ui/react";
+import Confetti from "react-confetti";
 
 const Index = () => {
   const [orderNumber, setOrderNumber] = useState("");
   const [orderStatus, setOrderStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const checkOrderStatus = async () => {
     setLoading(true);
     setError(null);
     setOrderStatus(null);
+    setShowConfetti(false);
 
     try {
       // Simulate an API call
@@ -21,6 +24,7 @@ const Index = () => {
         estimatedDelivery: "2023-10-15",
       };
       setOrderStatus(mockResponse);
+      setShowConfetti(true);
     } catch (err) {
       setError("Failed to fetch order status. Please try again.");
     } finally {
@@ -28,8 +32,16 @@ const Index = () => {
     }
   };
 
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => setShowConfetti(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
+
   return (
     <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+      {showConfetti && <Confetti />}
       <VStack spacing={4} width="100%">
         <Text fontSize="2xl">Order Status Checker</Text>
         <Input
